@@ -1,0 +1,199 @@
+# ==========================================
+# RTP GUI SISTEMI - GÜVENLI ARAMA VERSIYONU
+# ==========================================
+
+command /rtp:
+    trigger:
+        if {rtp::cooldown::%player%} is set:
+            send action bar "&cŞu anda ışınlanma sürecindesiniz!" to player
+            stop
+            
+        set {_gui} to a new chest inventory with 3 rows with name "&8&lRTP Menüsü"
+        
+        loop 27 times:
+            set slot (loop-value - 1) of {_gui} to black stained glass pane named " "
+            
+        set slot 11 of {_gui} to grass block named "&a&lOverworld" with lore "&7Ülke seçerek ışınlan.", "", "&eTıkla!"
+        set slot 13 of {_gui} to netherrack named "&c&lNether" with lore "&7Nether dünyasına RTP.", "", "&eTıkla!"
+        set slot 15 of {_gui} to end stone named "&d&lThe End" with lore "&7End dünyasına RTP.", "", "&eTıkla!"
+        
+        open {_gui} to player
+
+# ==========================================
+# GUI TIKLAMA
+# ==========================================
+
+on inventory click:
+    if name of event-inventory is "&8&lRTP Menüsü":
+        cancel event
+        
+        if clicked slot is 11:
+            openOverworldMenu(player)
+            stop
+            
+        if clicked slot is 13:
+            close player's inventory
+            startRtpProcess(player, "world_nether", 20000)
+            stop
+            
+        if clicked slot is 15:
+            close player's inventory
+            startRtpProcess(player, "world_the_end", 20000)
+            stop
+
+    if name of event-inventory is "&a&lOverworld Seçimi":
+        cancel event
+        
+        if clicked slot is 11:
+            close player's inventory
+            startRtpProcess(player, "world", 30000)
+            stop
+            
+        if clicked slot is 13:
+            close player's inventory
+            startRtpProcess(player, "world", 150000)
+            stop
+            
+        if clicked slot is 15:
+            close player's inventory
+            startRtpProcess(player, "world", 200000)
+            stop
+
+# ==========================================
+# OVERWORLD ÜLKE MENÜSÜ
+# ==========================================
+
+function openOverworldMenu(p: player):
+    set {_gui} to a new chest inventory with 3 rows with name "&a&lOverworld Seçimi"
+    
+    loop 27 times:
+        set slot (loop-value - 1) of {_gui} to black stained glass pane named " "
+    
+    set slot 11 of {_gui} to red wool named "&c&lTürkiye" with lore "&7Maks. Yarıçap: &e30000", "", "&aTıkla!"
+    set slot 13 of {_gui} to green wool named "&a&lAzerbaycan" with lore "&7Maks. Yarıçap: &e150000", "", "&aTıkla!"
+    set slot 15 of {_gui} to white wool named "&f&lRusya" with lore "&7Maks. Yarıçap: &e200000", "", "&aTıkla!"
+    
+    open {_gui} to {_p}
+
+# ==========================================
+# OYUNCU HAREKET EDERSE İPTAL ET
+# ==========================================
+
+on any move:
+    if {rtp::cooldown::%player%} is set:
+        clear {rtp::cooldown::%player%}
+        send action bar "&cHareket ettiğiniz için ışınlanma iptal edildi!" to player
+
+# ==========================================
+# RTP GERİ SAYIM
+# ==========================================
+
+function startRtpProcess(p: player, w: text, radius: number):
+    set {rtp::cooldown::%{_p}%} to true
+    
+    loop 5 times:
+        if {rtp::cooldown::%{_p}%} is not set:
+            stop
+            
+        set {_time} to 6 - loop-number
+        send action bar "&eIşınlanmaya son: &c%{_time}% saniye" to {_p}
+        play sound "block.note_block.pling" with volume 1 and pitch 1 to {_p}
+        wait 1 second
+        
+    if {rtp::cooldown::%{_p}%} is not set:
+        stop
+        
+    clear {rtp::cooldown::%{_p}%}
+    rtpPlayer({_p}, {_w}, {_radius})
+
+# ==========================================
+# RTP SİSTEMİ
+# ==========================================
+
+function rtpPlayer(p: player, w: text, radius: number):
+    send action bar "&eGüvenli bölge aranıyor..." to {_p}
+
+    set {_world} to world {_w}
+
+    if {_world} is not set:
+        send "&cDünya bulunamadı: &e%{_w}%" to {_p}
+        send "&7Eğer dünya adı farklıysa skriptte dünya adlarını değiştirin." to {_p}
+        stop
+
+    set {_min} to 0 - {_radius}
+
+    # 120 kez kontrol eder, sonsuz döngü yoktur
+    loop 120 times:
+        set {_x} to a random integer between {_min} and {_radius}
+        set {_z} to a random integer between {_min} and {_radius}
+
+    
+        # ==========================
+        # OVERWORLD GÜVENLİK KONTROLÜ
+        # ==========================
+        if {_w} is "world":
+            set {_base} to location at {_x}, 100, {_z} in {_world}
+            set {_highest} to highest solid block at {_base}
+            set {_loc} to location of {_highest}
+            add 1 to y-coordinate of {_loc}
+
+            if y-coordinate of {_loc} > 1:
+                if block at {_loc} is air:
+                    if block 1 above {_loc} is air:
+                        if block 1 below {_loc} is solid:
+                            set {_ground} to block 1 below {_loc}
+
+                            if type of {_ground} is not magma block:
+                                if type of {_ground} is not cactus:
+                                    if type of {_ground} is not campfire:
+                                        teleport {_p} to {_loc}
+                                        send action bar "&aBaşarıyla güvenli bölgeye ışınlandınız!" to {_p}
+                                        play sound "entity.enderman.teleport" with volume 1 and pitch 1 to {_p}
+                                        stop
+
+        # ==========================
+        # END GÜVENLİK KONTROLÜ
+        # ==========================
+        else if {_w} is "world_the_end":
+            set {_base} to location at {_x}, 100, {_z} in {_world}
+            set {_highest} to highest solid block at {_base}
+            set {_loc} to location of {_highest}
+            add 1 to y-coordinate of {_loc}
+
+            if y-coordinate of {_loc} > 5:
+                if block at {_loc} is air:
+                    if block 1 above {_loc} is air:
+                        if block 1 below {_loc} is solid:
+                            teleport {_p} to {_loc}
+                            send action bar "&aThe End dünyasında güvenli bölgeye ışınlandınız!" to {_p}
+                            play sound "entity.enderman.teleport" with volume 1 and pitch 1 to {_p}
+                            stop
+
+        # ==========================
+        # NETHER GÜVENLİK KONTROLÜ
+        # ==========================
+        else if {_w} is "world_nether":
+            set {_loc} to location at {_x}, 120, {_z} in {_world}
+
+            loop 100 times:
+                if y-coordinate of {_loc} > 10:
+                    if block at {_loc} is air:
+                        if block 1 above {_loc} is air:
+                            if block 1 below {_loc} is solid:
+                                set {_ground} to block 1 below {_loc}
+
+                                if type of {_ground} is not magma block:
+                                    if type of {_ground} is not cactus:
+                                        if type of {_ground} is not campfire:
+                                            teleport {_p} to {_loc}
+                                            send action bar "&aNether dünyasında güvenli bölgeye ışınlandınız!" to {_p}
+                                            play sound "entity.enderman.teleport" with volume 1 and pitch 1 to {_p}
+                                            stop
+
+                remove 1 from y-coordinate of {_loc}
+
+        wait 1 tick
+
+    send action bar "&cGüvenli bölge bulunamadı! Yeniden deneyin." to {_p}
+    send "&cGüvenli bölge bulunamadı. Lütfen tekrar &e/rtp &cyazın." to {_p}
+    play sound "entity.villager.no" with volume 1 and pitch 1 to {_p}
