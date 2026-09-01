@@ -1,0 +1,517 @@
+options:
+    prefix: <##A8A8A8>〔<##37BFF8>ᴛᴘᴀ<##A8A8A8>〕
+    cooldown: 7 seconds
+    teleport_delay: 5
+    version: <##7AFB00>1.7
+    enable_prefix: true
+    players_per_page: 28
+
+function getPrefix() :: text:
+    if {@enable_prefix} is true:
+        return "{@prefix} "
+    else:
+        return ""
+
+function openTpaToggleMenu(p: player):
+    set {_gui} to chest inventory with 3 rows named "<##37BFF8>ᴛᴘᴀ ʀᴇᴄᴇɪᴠɪɴɢ sᴇᴛᴛɪɴɢs"
+    loop 27 times:
+        set slot (loop-value - 1) of {_gui} to light blue stained glass pane named "<##A8A8A8> "
+    if {tpa::toggle::%{_p}'s uuid%} is true:
+        set slot 13 of {_gui} to red stained glass pane named "<##A8A8A8>ᴛᴜʀɴ ᴏꜰꜰ ᴛᴘᴀ" with lore "<##A8A8A8>───────────" and "<##A8A8A8>ᴄᴜʀʀᴇɴᴛʟʏ: <##A8A8A8>ᴏꜰꜰ" and "<##A8A8A8>ᴄʟɪᴄᴋ ᴛᴏ <##7AFB00>ᴇɴᴀʙʟᴇ <##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛs" and "<##A8A8A8>───────────"
+    else:
+        set slot 13 of {_gui} to lime stained glass pane named "<##7AFB00>ᴛᴜʀɴ ᴏɴ ᴛᴘᴀ" with lore "<##A8A8A8>───────────" and "<##A8A8A8>ᴄᴜʀʀᴇɴᴛʟʏ: <##7AFB00>ᴏɴ" and "<##A8A8A8>ᴄʟɪᴄᴋ ᴛᴏ <##A8A8A8>ᴅɪsᴀʙʟᴇ <##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛs" and "<##A8A8A8>───────────"
+    open {_gui} to {_p}
+    play sound "block.note_block.hat" with volume 1 with pitch 1 to {_p}
+
+function openTpaMenu(p: player):
+    if {tpa::request::player::%{_p}'s uuid%} is set:
+        set {_requester} to {tpa::request::player::%{_p}'s uuid%}
+        set {_type} to "tpa"
+        set {_message} to "<##A8A8A8>ᴡᴀɴᴛs ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ʏᴏᴜ"
+    else if {tpa::requesthere::player::%{_p}'s uuid%} is set:
+        set {_requester} to {tpa::requesthere::player::%{_p}'s uuid%}
+        set {_type} to "tpahere"
+        set {_message} to "<##A8A8A8>ᴡᴀɴᴛs ʏᴏᴜ ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ᴛʜᴇᴍ"
+    else:
+        send "%getPrefix()%<##A8A8A8>ʏᴏᴜ ʜᴀᴠᴇ ɴᴏ ᴘᴇɴᴅɪɴɢ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛs." to {_p}
+        stop
+    set {_gui} to chest inventory with 3 rows named "<##37BFF8>ᴄᴏɴꜰɪʀᴍ ᴛᴇʟᴇᴘᴏʀᴛᴀᴛɪᴏɴ"
+    loop 27 times:
+        set slot (loop-value - 1) of {_gui} to light blue stained glass pane named "<##A8A8A8> "
+    if {_requester} is flying:
+        set {_flying_status} to "ʏᴇs"
+    else:
+        set {_flying_status} to "ɴᴏ"
+    set slot 13 of {_gui} to skull of {_requester} named "<##7AFB00>%{_requester}%" with lore "<##A8A8A8>───────────" and "<##A8A8A8>%{_message}%" and "<##A8A8A8>───────────" and "<##A8A8A8>ɴᴀᴍᴇ: <##7AFB00>%{_requester}%" and "<##A8A8A8>ɪᴅ: <##7AFB00>%{_requester}'s uuid%" and "<##A8A8A8>ᴡᴏʀʟᴅ: <##7AFB00>%world of {_requester}%" and "<##A8A8A8>ꜰʟʏɪɴɢ: <##7AFB00>%{_flying_status}%" and "<##A8A8A8>───────────"
+    set slot 11 of {_gui} to lime stained glass pane named "<##7AFB00>ᴀᴄᴄᴇᴘᴛ" with lore "<##A8A8A8>───────────" and "<##A8A8A8>ᴄʟɪᴄᴋ ᴛᴏ ᴀᴄᴄᴇᴘᴛ ᴛʜᴇ" and "<##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ꜰʀᴏᴍ <##7AFB00>%{_requester}%" and "<##A8A8A8>───────────"
+    set slot 15 of {_gui} to red stained glass pane named "<##A8A8A8>ᴅᴇɴʏ" with lore "<##A8A8A8>───────────" and "<##A8A8A8>ᴄʟɪᴄᴋ ᴛᴏ ᴅᴇɴʏ ᴛʜᴇ" and "<##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ꜰʀᴏᴍ <##7AFB00>%{_requester}%" and "<##A8A8A8>───────────"
+    open {_gui} to {_p}
+    play sound "block.note_block.hat" with volume 1 with pitch 1 to {_p}
+
+function openTpaConfirmMenu(p: player, target: player):
+    set {_gui} to chest inventory with 3 rows named "<##37BFF8>ᴄᴏɴꜰɪʀᴍ ᴛᴘᴀ ʀᴇǫᴜᴇsᴛ"
+    loop 27 times:
+        set slot (loop-value - 1) of {_gui} to light blue stained glass pane named "<##A8A8A8> "
+    if {_target} is flying:
+        set {_flying_status} to "ʏᴇs"
+    else:
+        set {_flying_status} to "ɴᴏ"
+    set slot 13 of {_gui} to skull of {_target} named "<##7AFB00>%{_target}%" with lore "<##A8A8A8>───────────" and "<##A8A8A8>ʏᴏᴜ ᴀʀᴇ sᴇɴᴅɪɴɢ ᴀ ᴛᴘᴀ ʀᴇǫᴜᴇsᴛ ᴛᴏ ᴛʜɪs ᴘʟᴀʏᴇʀ" and "<##A8A8A8>───────────" and "<##A8A8A8>ɴᴀᴍᴇ: <##7AFB00>%{_target}%" and "<##A8A8A8>ɪᴅ: <##7AFB00>%{_target}'s uuid%" and "<##A8A8A8>ᴡᴏʀʟᴅ: <##7AFB00>%world of {_target}%" and "<##A8A8A8>ꜰʟʏɪɴɢ: <##7AFB00>%{_flying_status}%" and "<##A8A8A8>───────────"
+    set slot 11 of {_gui} to lime stained glass pane named "<##7AFB00>ᴄᴏɴꜰɪʀᴍ" with lore "<##A8A8A8>───────────" and "<##A8A8A8>ᴄʟɪᴄᴋ ᴛᴏ sᴇɴᴅ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ" and "<##A8A8A8>ᴛᴏ <##7AFB00>%{_target}%" and "<##A8A8A8>───────────"
+    set slot 15 of {_gui} to red stained glass pane named "<##A8A8A8>ᴄᴀɴᴄᴇʟ" with lore "<##A8A8A8>───────────" and "<##A8A8A8>ᴄʟɪᴄᴋ ᴛᴏ ᴄᴀɴᴄᴇʟ ᴛʜᴇ ʀᴇǫᴜᴇsᴛ" and "<##A8A8A8>───────────"
+    set {tpa::confirm::%{_p}'s uuid%} to {_target}
+    open {_gui} to {_p}
+    play sound "block.note_block.hat" with volume 1 with pitch 1 to {_p}
+
+function openTpaPlayerMenu(p: player, page: integer):
+    set {_players::*} to all players where [input is not {_p}]
+    set {_total} to size of {_players::*}
+    set {_per_page} to {@players_per_page}
+    set {_total_pages} to ceiling({_total} / {_per_page})
+    if {_total} is 0:
+        send "%getPrefix()%<##A8A8A8>ɴᴏ ᴏᴛʜᴇʀ ᴘʟᴀʏᴇʀs ᴀʀᴇ ᴏɴʟɪɴᴇ." to {_p}
+        stop
+    if {_page} < 1:
+        set {_page} to 1
+    else if {_page} > {_total_pages}:
+        set {_page} to {_total_pages}
+    set {_start} to ({_page} - 1) * {_per_page}
+    set {_end} to {_start} + {_per_page} - 1
+    if {_end} >= {_total}:
+        set {_end} to {_total} - 1
+    set {_gui} to chest inventory with 6 rows named "<##37BFF8>sᴇʟᴇᴄᴛ ᴘʟᴀʏᴇʀ ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ - ᴘᴀɢᴇ %{_page}%"
+    loop 54 times:
+        set slot (loop-value - 1) of {_gui} to light blue stained glass pane named "<##A8A8A8> "
+    set {_slot} to 10
+    loop {_end} - {_start} + 1 times:
+        set {_index} to {_start} + loop-value - 1
+        if {_index} < {_total}:
+            set {_target} to {_players::%{_index} + 1%}
+            set slot {_slot} of {_gui} to skull of {_target} named "<##7AFB00>%{_target}%" with lore "<##A8A8A8>───────────" and "<##A8A8A8>ᴄʟɪᴄᴋ ᴛᴏ sᴇɴᴅ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ" and "<##A8A8A8>ᴛᴏ <##7AFB00>%{_target}%" and "<##A8A8A8>───────────"
+            set {tpa::menu::slot::%{_slot}%::%{_p}'s uuid%} to {_target}
+            set {_skip} to false
+            if {_slot} is 16:
+                set {_skip} to true
+            else if {_slot} is 25:
+                set {_skip} to true
+            else if {_slot} is 34:
+                set {_skip} to true
+            if {_skip} is true:
+                add 2 to {_slot}
+            else:
+                add 1 to {_slot}
+    if {_page} > 1:
+        set slot 45 of {_gui} to arrow named "<##7AFB00>ᴘʀᴇᴠɪᴏᴜs ᴘᴀɢᴇ" with lore "<##A8A8A8>───────────" and "<##A8A8A8>ɢᴏ ᴛᴏ ᴘᴀɢᴇ <##7AFB00>%{_page - 1}%" and "<##A8A8A8>───────────"
+    else:
+        set slot 45 of {_gui} to light blue stained glass pane named "<##A8A8A8> "
+    set slot 49 of {_gui} to barrier named "<##A8A8A8>ᴄʟᴏsᴇ" with lore "<##A8A8A8>───────────" and "<##A8A8A8>ᴄʟᴏsᴇ ᴛʜᴇ ᴍᴇɴᴜ" and "<##A8A8A8>───────────"
+    if {_page} < {_total_pages}:
+        set slot 53 of {_gui} to arrow named "<##7AFB00>ɴᴇxᴛ ᴘᴀɢᴇ" with lore "<##A8A8A8>───────────" and "<##A8A8A8>ɢᴏ ᴛᴏ ᴘᴀɢᴇ <##7AFB00>%{_page + 1}%" and "<##A8A8A8>───────────"
+    else:
+        set slot 53 of {_gui} to light blue stained glass pane named "<##A8A8A8> "
+    open {_gui} to {_p}
+    play sound "block.note_block.hat" with volume 1 with pitch 1 to {_p}
+
+function openTpaAdminMenu(p: player):
+    set {_gui} to chest inventory with 3 rows named "<##37BFF8>ᴛᴘᴀ ᴀᴅᴍɪɴ"
+    loop 27 times:
+        set slot (loop-value - 1) of {_gui} to light blue stained glass pane named "<##A8A8A8> "
+    set slot 10 of {_gui} to emerald named "<##7AFB00>ʀᴇʟᴏᴀᴅ ᴛᴘᴀ" with lore "<##A8A8A8>───────────" and "<##A8A8A8>ʀᴇʟᴏᴀᴅ ᴛᴘᴀ ᴘʟᴜɢɪɴ" and "<##A8A8A8>ᴄᴜʀʀᴇɴᴛ ᴠᴇʀsɪᴏɴ: {@version}" and "<##A8A8A8>───────────"
+    if {tpa::prefix} is true:
+        set {_prefix_status} to "<##7AFB00>ᴏɴ"
+    else:
+        set {_prefix_status} to "<##A8A8A8>ᴏꜰꜰ"
+    set slot 12 of {_gui} to comparator named "<##37BFF8>ᴛᴏɢɢʟᴇ ᴘʀᴇꜰɪx" with lore "<##A8A8A8>───────────" and "<##A8A8A8>ᴄᴜʀʀᴇɴᴛ sᴛᴀᴛᴜs: %{_prefix_status}%" and "<##A8A8A8>ᴄʟɪᴄᴋ ᴛᴏ ᴄʜᴀɴɢᴇ" and "<##A8A8A8>───────────"
+    set slot 13 of {_gui} to book named "<##37BFF8>ᴛᴘᴀ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ" with lore "<##A8A8A8>───────────" and "<##A8A8A8>ᴠᴇʀsɪᴏɴ: {@version}" and "<##A8A8A8>ᴀᴜᴛʜᴏʀ: <##7AFB00>Omh" and "<##A8A8A8>ᴛʜᴀɴᴋ ʏᴏᴜ ꜰᴏʀ ᴜsɪɴɢ!" and "<##A8A8A8>───────────"
+    set slot 16 of {_gui} to barrier named "<##A8A8A8>ᴄʟᴏsᴇ" with lore "<##A8A8A8>───────────" and "<##A8A8A8>ᴄʟᴏsᴇ ᴀᴅᴍɪɴ ᴍᴇɴᴜ" and "<##A8A8A8>───────────"
+    open {_gui} to {_p}
+    play sound "block.note_block.hat" with volume 1 with pitch 1 to {_p}
+
+function sendTpaRequest(sender: player, target: player):
+    if {tpa::toggle::%{_target}'s uuid%} is true:
+        send "%getPrefix()%<##A8A8A8>ᴘʟᴀʏᴇʀ <##7AFB00>%{_target}% <##A8A8A8>ʜᴀs ᴅɪsᴀʙʟᴇᴅ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛs" to {_sender}
+        stop
+
+    if {_target} is online:
+        if {_target} is not {_sender}:
+            play sound "entity.player.levelup" with volume 1 with pitch 1 to {_sender}
+            play sound "entity.player.levelup" with volume 1 with pitch 1 to {_target}
+            send "%getPrefix()%<##A8A8A8>ʏᴏᴜ ʜᴀᴠᴇ sᴇɴᴛ ᴀ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ᴛᴏ <##7AFB00>%{_target}%" to {_sender}
+            send action bar "<##7AFB00>ᴛᴘᴀ ʀᴇǫᴜᴇsᴛ sᴇɴᴛ ᴛᴏ <##7AFB00>%{_target}%" to {_sender}
+            send "%getPrefix()%<##7AFB00>%{_sender}% <##A8A8A8>ᴡᴀɴᴛs ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ʏᴏᴜ" to {_target}
+            send action bar "<##7AFB00>%{_sender}% <##A8A8A8>sᴇɴᴛ ʏᴏᴜ ᴀ ᴛᴘᴀ ʀᴇǫᴜᴇsᴛ" to {_target}
+            send formatted "<run command:/tpaccept><##37BFF8>[ᴄʟɪᴄᴋ ᴛᴏ ᴀᴄᴄᴇᴘᴛ]</run> <##A8A8A8>ᴏʀ <##37BFF8>ᴛʏᴘᴇ /tpaccept" to {_target}
+            send formatted "<run command:/tpdeny><##FF5555>[ᴄʟɪᴄᴋ ᴛᴏ ᴅᴇɴʏ]</run> <##A8A8A8>ᴏʀ <##FF5555>ᴛʏᴘᴇ /tpdeny" to {_target}
+            set {tpa::request::player::%{_target}'s uuid%} to {_sender}
+            set {tpa::request_time::%{_target}'s uuid%} to now
+            wait 30 seconds
+            if {tpa::request::player::%{_target}'s uuid%} is set:
+                if difference between {tpa::request_time::%{_target}'s uuid%} and now is less than 31 seconds:
+                    send "%getPrefix()%<##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ᴛᴏ <##7AFB00>%{_target}% <##A8A8A8>ʜᴀs ᴇxᴘɪʀᴇᴅ" to {_sender}
+                    send "%getPrefix()%<##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ꜰʀᴏᴍ <##7AFB00>%{_sender}% <##A8A8A8>ʜᴀs ᴇxᴘɪʀᴇᴅ" to {_target}
+                    delete {tpa::request::player::%{_target}'s uuid%}
+                    delete {tpa::request_time::%{_target}'s uuid%}
+        else:
+            send "%getPrefix()%<##A8A8A8>ʏᴏᴜ ᴄᴀɴɴᴏᴛ ʀᴇǫᴜᴇsᴛ ʏᴏᴜʀsᴇʟꜰ ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ" to {_sender}
+    else:
+        send "%getPrefix()%<##A8A8A8>ᴛʜᴀᴛ ᴘʟᴀʏᴇʀ ɪs ɴᴏᴛ ᴏɴʟɪɴᴇ" to {_sender}
+
+function executeTeleport(p: player):
+    if {tpa::request::player::%{_p}'s uuid%} is set:
+        set {_other} to {tpa::request::player::%{_p}'s uuid%}
+        set {_here} to false
+        delete {tpa::request::player::%{_p}'s uuid%}
+        delete {tpa::request_time::%{_p}'s uuid%}
+    else if {tpa::requesthere::player::%{_p}'s uuid%} is set:
+        set {_other} to {tpa::requesthere::player::%{_p}'s uuid%}
+        set {_here} to true
+        delete {tpa::requesthere::player::%{_p}'s uuid%}
+        delete {tpa::requesthere_time::%{_p}'s uuid%}
+    else:
+        send "%getPrefix()%<##A8A8A8>ɴᴏ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ᴛᴏ ᴀᴄᴄᴇᴘᴛ." to {_p}
+        stop
+    if {_p} has permission "tpa.admin":
+        play sound "entity.ender_dragon.growl" with volume 0.5 with pitch 1.5 to {_other}
+        play sound "entity.ender_dragon.growl" with volume 0.5 with pitch 1.5 to {_p}
+        send "%getPrefix()%<##A8A8A8>ᴀᴅᴍɪɴ <##7AFB00>%{_p}% <##A8A8A8>ʜᴀs ᴀᴄᴄᴇᴘᴛᴇᴅ ʏᴏᴜʀ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ!" to {_other}
+        send "%getPrefix()%<##A8A8A8>ᴀᴅᴍɪɴ <##7AFB00>ʏᴏᴜ <##A8A8A8>ʜᴀᴠᴇ ᴀᴄᴄᴇᴘᴛᴇᴅ <##7AFB00>%{_other}%<##A8A8A8>'s ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ!" to {_p}
+    else:
+        play sound "entity.player.levelup" with volume 1 with pitch 1 to {_other}
+        play sound "entity.player.levelup" with volume 1 with pitch 1 to {_p}
+        send "%getPrefix()%<##7AFB00>ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ᴀᴄᴄᴇᴘᴛᴇᴅ" to {_p}
+        send "%getPrefix()%<##7AFB00>%{_p}% <##A8A8A8>ʜᴀs ᴀᴄᴄᴇᴘᴛᴇᴅ ʏᴏᴜʀ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ" to {_other}
+    if {_here} is true:
+        set {_teleporter} to {_p}
+        set {_destination} to {_other}
+    else:
+        set {_teleporter} to {_other}
+        set {_destination} to {_p}
+    set {_loc} to location of {_teleporter}
+    play sound "entity.enderman.teleport" with volume 1 with pitch 1 to {_teleporter}
+    set {tpa::%{_teleporter}'s uuid%::teleporting} to true
+    set {_delay} to {@teleport_delay}
+    if {_teleporter} has permission "tpa.bypass":
+        set {_delay} to 2
+    loop {_delay} times:
+        if {tpa::%{_teleporter}'s uuid%::teleporting} is not set:
+            send action bar "" to {_teleporter}
+            send action bar "" to {_destination}
+            stop
+        play sound "entity.enderman.teleport" with volume 1 with pitch 1 to {_teleporter}
+        send action bar "<##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛɪɴɢ ɪɴ <##7AFB00>%{_delay}+1-loop-value% <##A8A8A8>sᴇᴄᴏɴᴅs. ᴅᴏɴ'ᴛ ᴍᴏᴠᴇ!" to {_teleporter}
+        send action bar "<##A8A8A8>ᴘʟᴀʏᴇʀ ᴡɪʟʟ ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ʏᴏᴜ ɪɴ <##7AFB00>%{_delay}+1-loop-value% <##A8A8A8>sᴇᴄᴏɴᴅs" to {_destination}
+        if distance between {_loc} and location of {_teleporter} > 0.1:
+            send "%getPrefix()%<##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛᴀᴛɪᴏɴ ᴄᴀɴᴄᴇʟᴇᴅ ʙᴇᴄᴀᴜsᴇ ʏᴏᴜ ᴍᴏᴠᴇᴅ!" to {_teleporter}
+            send "%getPrefix()%<##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛᴀᴛɪᴏɴ ᴄᴀɴᴄᴇʟᴇᴅ ʙᴇᴄᴀᴜsᴇ ᴛʜᴇ ᴏᴛʜᴇʀ ᴘʟᴀʏᴇʀ ᴍᴏᴠᴇᴅ!" to {_destination}
+            delete {tpa::%{_teleporter}'s uuid%::teleporting}
+            send action bar "" to {_teleporter}
+            send action bar "" to {_destination}
+            stop
+        wait 1 second
+    delete {tpa::%{_teleporter}'s uuid%::teleporting}
+    send action bar "" to {_teleporter}
+    send action bar "" to {_destination}
+    teleport {_teleporter} to {_destination}
+    play sound "entity.enderman.teleport" with volume 1 with pitch 2 to {_teleporter}
+    play sound "entity.enderman.teleport" with volume 1 with pitch 2 to {_destination}
+    send "%getPrefix()%<##7AFB00>ᴛᴇʟᴇᴘᴏʀᴛᴀᴛɪᴏɴ sᴜᴄᴄᴇssꜰᴜʟ!" to {_teleporter}
+    send "%getPrefix()%<##7AFB00>%{_teleporter}% <##A8A8A8>ʜᴀs ᴛᴇʟᴇᴘᴏʀᴛᴇᴅ ᴛᴏ ʏᴏᴜ!" to {_destination}
+
+command tpa [<player>]:
+    description: <##A8A8A8>sᴇɴᴅ ᴀ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ᴛᴏ ᴀ ᴘʟᴀʏᴇʀ ᴏʀ ᴏᴘᴇɴ ᴍᴇɴᴜ
+    aliases: tp
+    cooldown: {@cooldown}
+    cooldown message: %getPrefix()%<##A8A8A8>ʏᴏᴜ ᴍᴜsᴛ ᴡᴀɪᴛ <##7AFB00>%remaining time% <##A8A8A8>ᴛᴏ ᴜsᴇ ᴛʜɪs ᴀɢᴀɪɴ!
+    trigger:
+        if arg-1 is set:
+            if arg-1 is online:
+                if arg-1 is not player:
+                    openTpaConfirmMenu(player, arg-1)
+                else:
+                    send "%getPrefix()%<##A8A8A8>ʏᴏᴜ ᴄᴀɴɴᴏᴛ ʀᴇǫᴜᴇsᴛ ʏᴏᴜʀsᴇʟꜰ ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ" to player
+            else:
+                send "%getPrefix()%<##A8A8A8>ᴛʜᴀᴛ ᴘʟᴀʏᴇʀ ɪs ɴᴏᴛ ᴏɴʟɪɴᴇ" to player
+        else:
+            openTpaPlayerMenu(player, 1)
+
+command tpaccept:
+    description: <##A8A8A8>ᴏᴘᴇɴ ᴍᴇɴᴜ ᴛᴏ ᴀᴄᴄᴇᴘᴛ ᴀ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ
+    aliases: yes, y, acp
+    trigger:
+        openTpaMenu(player)
+
+command tpahere [<player>]:
+    description: <##A8A8A8>ʀᴇǫᴜᴇsᴛ ᴀɴᴏᴛʜᴇʀ ᴘʟᴀʏᴇʀ ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ʏᴏᴜ
+    usage: /tpahere <player>
+    cooldown: {@cooldown}
+    cooldown message: %getPrefix()%<##A8A8A8>ʏᴏᴜ ᴍᴜsᴛ ᴡᴀɪᴛ <##7AFB00>%remaining time% <##A8A8A8>ᴛᴏ ᴜsᴇ ᴛʜɪs ᴀɢᴀɪɴ!
+    trigger:
+        if arg-1 is set:
+            if {tpa::toggle::%arg-1's uuid%} is true:
+                send "%getPrefix()%<##A8A8A8>ᴘʟᴀʏᴇʀ <##7AFB00>%arg-1% <##A8A8A8>ʜᴀs ᴅɪsᴀʙʟᴇᴅ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛs" to player
+                stop
+            if arg-1 is online:
+                if arg-1 is not player:
+                    play sound "entity.player.levelup" with volume 1 with pitch 1 to player
+                    play sound "entity.player.levelup" with volume 1 with pitch 1 to arg-1
+                    send "%getPrefix()%<##A8A8A8>ʏᴏᴜ ʜᴀᴠᴇ ʀᴇǫᴜᴇsᴛᴇᴅ <##7AFB00>%arg-1% <##A8A8A8>ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ʏᴏᴜ" to player
+                    send action bar "<##7AFB00>ᴛᴘᴀ ʀᴇǫᴜᴇsᴛ sᴇɴᴛ ᴛᴏ <##7AFB00>%arg-1%" to player
+                    send "%getPrefix()%<##7AFB00>%player% <##A8A8A8>ᴡᴀɴᴛs ʏᴏᴜ ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ᴛʜᴇᴍ" to arg-1
+                    send action bar "<##7AFB00>%player% <##A8A8A8>sᴇɴᴛ ʏᴏᴜ ᴀ ᴛᴘᴀ ʀᴇǫᴜᴇsᴛ" to arg-1
+                    send formatted "<run command:/tpaccept><##37BFF8>[ᴄʟɪᴄᴋ ᴛᴏ ᴀᴄᴄᴇᴘᴛ] <##A8A8A8>ᴏʀ ᴛʏᴘᴇ <##37BFF8>/tpaccept" to arg-1
+                    set {tpa::requesthere::player::%arg-1's uuid%} to player
+                    set {tpa::requesthere_time::%arg-1's uuid%} to now
+                    wait 30 seconds
+                    if {tpa::requesthere::player::%arg-1's uuid%} is set:
+                        if difference between {tpa::requesthere_time::%arg-1's uuid%} and now is less than 31 seconds:
+                            send "%getPrefix()%<##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ᴛᴏ <##7AFB00>%arg-1% <##A8A8A8>ʜᴀs ᴇxᴘɪʀᴇᴅ" to player
+                            send "%getPrefix()%<##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ꜰʀᴏᴍ <##7AFB00>%player% <##A8A8A8>ʜᴀs ᴇxᴘɪʀᴇᴅ" to arg-1
+                            delete {tpa::requesthere::player::%arg-1's uuid%}
+                            delete {tpa::requesthere_time::%arg-1's uuid%}
+                else:
+                    send "%getPrefix()%<##A8A8A8>ʏᴏᴜ ᴄᴀɴɴᴏᴛ ʀᴇǫᴜᴇsᴛ ʏᴏᴜʀsᴇʟꜰ ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ" to player
+            else:
+                send "%getPrefix()%<##A8A8A8>ᴛʜᴀᴛ ᴘʟᴀʏᴇʀ ɪs ɴᴏᴛ ᴏɴʟɪɴᴇ" to player
+        else:
+            send "%getPrefix()%<##A8A8A8>ᴘʟᴇᴀsᴇ sᴘᴇᴄɪꜰʏ ᴀ ᴘʟᴀʏᴇʀ: <##37BFF8>/tpahere <player>" to player
+
+command tpaall:
+    description: <##A8A8A8>ʀᴇǫᴜᴇsᴛ ᴀʟʟ ᴏɴʟɪɴᴇ ᴘʟᴀʏᴇʀs ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ʏᴏᴜ
+    permission: tpa.admin
+    permission message: %getPrefix()%<##A8A8A8>ʏᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴ ᴛᴏ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ.
+    trigger:
+        set {_count} to 0
+        loop all players:
+            if loop-player is not player:
+                if {tpa::toggle::%loop-player's uuid%} is not true:
+                    add 1 to {_count}
+                    play sound "entity.player.levelup" with volume 1 with pitch 1 to player
+                    play sound "entity.player.levelup" with volume 1 with pitch 1 to loop-player
+                    send "%getPrefix()%<##A8A8A8>ʏᴏᴜ ʜᴀᴠᴇ ʀᴇǫᴜᴇsᴛᴇᴅ <##7AFB00>%loop-player% <##A8A8A8>ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ʏᴏᴜ" to player
+                    send action bar "<##7AFB00>ᴛᴘᴀ ʀᴇǫᴜᴇsᴛ sᴇɴᴛ ᴛᴏ <##7AFB00>%loop-player%" to player
+                    send "%getPrefix()%<##7AFB00>%player% <##A8A8A8>ᴡᴀɴᴛs ʏᴏᴜ ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ᴛʜᴇᴍ" to loop-player
+                    send action bar "<##7AFB00>%player% <##A8A8A8>sᴇɴᴛ ʏᴏᴜ ᴀ ᴛᴘᴀ ʀᴇǫᴜᴇsᴛ" to loop-player
+                    send formatted "<run command:/tpaccept><##37BFF8>[ᴄʟɪᴄᴋ ᴛᴏ ᴀᴄᴄᴇᴘᴛ] <##A8A8A8>ᴏʀ ᴛʏᴘᴇ <##37BFF8>/tpaccept" to loop-player
+                    set {tpa::requesthere::player::%loop-player's uuid%} to player
+                    set {tpa::requesthere_time::%loop-player's uuid%} to now
+        if {_count} is 0:
+            send "%getPrefix()%<##A8A8A8>ɴᴏ ᴇʟɪɢɪʙʟᴇ ᴘʟᴀʏᴇʀs ᴛᴏ ʀᴇǫᴜᴇsᴛ." to player
+        else:
+            send "%getPrefix()%<##7AFB00>sᴇɴᴛ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛs ᴛᴏ <##7AFB00>%{_count}% <##A8A8A8>ᴘʟᴀʏᴇʀs!" to player
+        wait 30 seconds
+        loop all players:
+            if {tpa::requesthere::player::%loop-player's uuid%} is player:
+                if difference between {tpa::requesthere_time::%loop-player's uuid%} and now is less than 31 seconds:
+                    send "%getPrefix()%<##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ᴛᴏ <##7AFB00>%loop-player% <##A8A8A8>ʜᴀs ᴇxᴘɪʀᴇᴅ" to player
+                    send "%getPrefix()%<##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ꜰʀᴏᴍ <##7AFB00>%player% <##A8A8A8>ʜᴀs ᴇxᴘɪʀᴇᴅ" to loop-player
+                    delete {tpa::requesthere::player::%loop-player's uuid%}
+                    delete {tpa::requesthere_time::%loop-player's uuid%}
+
+command tpask [<player>]:
+    description: <##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛ ᴀ sᴘᴇᴄɪꜰɪᴇᴅ ᴘʟᴀʏᴇʀ ᴛᴏ ʏᴏᴜ
+    permission: tpa.admin
+    permission message: %getPrefix()%<##A8A8A8>ʏᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴ ᴛᴏ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ.
+    trigger:
+        if arg-1 is set:
+            if arg-1 is online:
+                if arg-1 is not player:
+                    if {tpa::toggle::%arg-1's uuid%} is true:
+                        send "%getPrefix()%<##A8A8A8>ᴘʟᴀʏᴇʀ <##7AFB00>%arg-1% <##A8A8A8>ʜᴀs ᴅɪsᴀʙʟᴇᴅ ᴛᴇʟᴇᴘᴏʀᴛᴀᴛɪᴏɴ." to player
+                        stop
+                    teleport arg-1 to player
+                    play sound "entity.enderman.teleport" with volume 1 with pitch 2 to arg-1
+                    play sound "entity.enderman.teleport" with volume 1 with pitch 2 to player
+                    send "%getPrefix()%<##7AFB00>%arg-1% <##A8A8A8>ʜᴀs ʙᴇᴇɴ ᴛᴇʟᴇᴘᴏʀᴛᴇᴅ ᴛᴏ ʏᴏᴜ!" to player
+                    send "%getPrefix()%<##A8A8A8>ʏᴏᴜ ʜᴀᴠᴇ ʙᴇᴇɴ ᴛᴇʟᴇᴘᴏʀᴛᴇᴅ ᴛᴏ <##7AFB00>%player% <##A8A8A8>ʙʏ ᴀᴅᴍɪɴ!" to arg-1
+                else:
+                    send "%getPrefix()%<##A8A8A8>ʏᴏᴜ ᴄᴀɴɴᴏᴛ ᴛᴇʟᴇᴘᴏʀᴛ ʏᴏᴜʀsᴇʟꜰ!" to player
+            else:
+                send "%getPrefix()%<##A8A8A8>ᴛʜᴀᴛ ᴘʟᴀʏᴇʀ ɪs ɴᴏᴛ ᴏɴʟɪɴᴇ" to player
+        else:
+            send "%getPrefix()%<##A8A8A8>ᴘʟᴇᴀsᴇ sᴘᴇᴄɪꜰʏ ᴀ ᴘʟᴀʏᴇʀ: <##37BFF8>/tpask <player>" to player
+
+command tpacancel:
+    description: <##A8A8A8>ᴄᴀɴᴄᴇʟ ᴀʟʟ ʏᴏᴜʀ ᴘᴇɴᴅɪɴɢ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛs
+    trigger:
+        send "%getPrefix()%<##7AFB00>ᴄᴀɴᴄᴇʟᴇᴅ ᴀʟʟ ᴘᴇɴᴅɪɴɢ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛs" to player
+        loop all players:
+            if {tpa::request::player::%loop-player's uuid%} is player:
+                send "%getPrefix()%<##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ꜰʀᴏᴍ <##7AFB00>%player% <##A8A8A8>ʜᴀs ʙᴇᴇɴ ᴄᴀɴᴄᴇʟᴇᴅ" to loop-player
+                delete {tpa::request::player::%loop-player's uuid%}
+                delete {tpa::request_time::%loop-player's uuid%}
+            if {tpa::requesthere::player::%loop-player's uuid%} is player:
+                send "%getPrefix()%<##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ᴛᴏ <##7AFB00>%player% <##A8A8A8>ʜᴀs ʙᴇᴇɴ ᴄᴀɴᴄᴇʟᴇᴅ" to loop-player
+                delete {tpa::requesthere::player::%loop-player's uuid%}
+                delete {tpa::requesthere_time::%loop-player's uuid%}
+
+command tpdeny:
+    description: <##A8A8A8>ᴏᴘᴇɴ ᴍᴇɴᴜ ᴛᴏ ᴅᴇɴʏ ᴀ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ
+    aliases: no, n
+    trigger:
+        openTpaMenu(player)
+
+command tpatoggle:
+    description: <##A8A8A8>ᴛᴏɢɢʟᴇ ᴡʜᴇᴛʜᴇʀ ʏᴏᴜ ʀᴇᴄᴇɪᴠᴇ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛs
+    aliases: tpat
+    trigger:
+        openTpaToggleMenu(player)
+
+command tpahelp:
+    description: <##A8A8A8>ᴅɪsᴘʟᴀʏ ᴀ ʟɪsᴛ ᴏꜰ ᴛᴘᴀ ᴄᴏᴍᴍᴀɴᴅs ᴀɴᴅ ᴛʜᴇɪʀ ᴜsᴀɢᴇ
+    aliases: tpahelp
+    trigger:
+        send "" to player
+        send "<##A8A8A8>─────────── <##37BFF8>ᴛᴘᴀ ʜᴇʟᴘ <##A8A8A8>───────────" to player
+        send "<##37BFF8>/tpa [<player>] <##A8A8A8>- sᴇɴᴅ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ᴏʀ ᴏᴘᴇɴ ᴍᴇɴᴜ" to player
+        send "<##37BFF8>/tpahere <player> <##A8A8A8>- ʀᴇǫᴜᴇsᴛ ᴘʟᴀʏᴇʀ ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ʏᴏᴜ" to player
+        if player has permission "tpa.admin":
+            send "<##37BFF8>/tpaall <##A8A8A8>- ʀᴇǫᴜᴇsᴛ ᴀʟʟ ᴘʟᴀʏᴇʀs ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ʏᴏᴜ (ᴀᴅᴍɪɴ)" to player
+            send "<##37BFF8>/tpask <player> <##A8A8A8>- ᴛᴇʟᴇᴘᴏʀᴛ ᴀ ᴘʟᴀʏᴇʀ ᴛᴏ ʏᴏᴜ (ᴀᴅᴍɪɴ)" to player
+        send "<##37BFF8>/tpaccept <##A8A8A8>- ᴏᴘᴇɴ ᴍᴇɴᴜ ᴛᴏ ᴀᴄᴄᴇᴘᴛ ʀᴇǫᴜᴇsᴛ (ᴀʟsᴏ <##37BFF8>/yes<##A8A8A8>, <##37BFF8>/y<##A8A8A8>, <##37BFF8>/acp<##A8A8A8>)" to player
+        send "<##37BFF8>/tpdeny <##A8A8A8>- ᴏᴘᴇɴ ᴍᴇɴᴜ ᴛᴏ ᴅᴇɴʏ ʀᴇǫᴜᴇsᴛ (ᴀʟsᴏ <##37BFF8>/no<##A8A8A8>, <##37BFF8>/n<##A8A8A8>)" to player
+        send "<##37BFF8>/tpacancel <##A8A8A8>- ᴄᴀɴᴄᴇʟ ᴀʟʟ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛs" to player
+        send "<##37BFF8>/tpatoggle <##A8A8A8>- ᴛᴏɢɢʟᴇ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛs (ᴀʟsᴏ <##37BFF8>/tpat<##A8A8A8>)" to player
+        if player has permission "tpa.admin":
+            send "<##37BFF8>/tpaadmin <##A8A8A8>- ᴅɪsᴘʟᴀʏ ᴛᴘᴀ ᴀᴅᴍɪɴ ᴍᴇɴᴜ" to player
+        send "<##A8A8A8>───────────────────────────────" to player
+        send "" to player
+
+command tpaadmin:
+    description: <##A8A8A8>ᴏᴘᴇɴ ᴛʜᴇ ᴛᴘᴀ ᴀᴅᴍɪɴ ᴍᴇɴᴜ ᴛᴏ ᴍᴀɴᴀɢᴇ sᴇᴛᴛɪɴɢs
+    permission: tpa.admin
+    permission message: %getPrefix()%<##A8A8A8>ʏᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴ ᴛᴏ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ.
+    trigger:
+        openTpaAdminMenu(player)
+
+on inventory click:
+    if name of event-inventory is "<##37BFF8>ᴛᴘᴀ ʀᴇᴄᴇɪᴠɪɴɢ sᴇᴛᴛɪɴɢs":
+        cancel event
+        if index of event-slot is 13:
+            close player's inventory
+            if {tpa::toggle::%player's uuid%} is true:
+                delete {tpa::toggle::%player's uuid%}
+                send "%getPrefix()%<##7AFB00>ʏᴏᴜ ʜᴀᴠᴇ ᴇɴᴀʙʟᴇᴅ <##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛs." to player
+                play sound "entity.experience_orb.pickup" with volume 1 with pitch 1 to player
+            else:
+                set {tpa::toggle::%player's uuid%} to true
+                send "%getPrefix()%<##A8A8A8>ʏᴏᴜ ʜᴀᴠᴇ ᴅɪsᴀʙʟᴇᴅ <##A8A8A8>ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛs." to player
+                play sound "entity.experience_orb.pickup" with volume 1 with pitch 0.5 to player
+    else if name of event-inventory is "<##37BFF8>ᴄᴏɴꜰɪʀᴍ ᴛᴇʟᴇᴘᴏʀᴛᴀᴛɪᴏɴ":
+        cancel event
+        if index of event-slot is 11:
+            close player's inventory
+            executeTeleport(player)
+            play sound "block.note_block.pling" with volume 1 with pitch 1 to player
+        else if index of event-slot is 15:
+            close player's inventory
+            if {tpa::request::player::%player's uuid%} is set:
+                set {_requester} to {tpa::request::player::%player's uuid%}
+                if player has permission "tpa.admin":
+                    send "%getPrefix()%<##A8A8A8>ᴀᴅᴍɪɴ<##A8A8A8>%player% <##A8A8A8>ʜᴀs ᴅᴇɴɪᴇᴅ ʏᴏᴜʀ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ!" to {_requester}
+                    send "%getPrefix()%<##A8A8A8>ᴀᴅᴍɪɴ<##A8A8A8>ʏᴏᴜ ʜᴀᴠᴇ ᴅᴇɴɪᴇᴅ ᴛʜᴇ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ꜰʀᴏᴍ<##7AFB00>%{_requester}%!" to player
+                else:
+                    send "%getPrefix()%<##A8A8A8>ʏᴏᴜ ʜᴀᴠᴇ ᴅᴇɴɪᴇᴅ ᴛʜᴇ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ꜰʀᴏᴍ <##7AFB00>%{_requester}%." to player
+                    send "%getPrefix()%<##A8A8A8>ʏᴏᴜʀ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ᴡᴀs ᴅᴇɴɪᴇᴅ ʙʏ <##7AFB00>%player%." to {_requester}
+                delete {tpa::request::player::%player's uuid%}
+                delete {tpa::request_time::%player's uuid%}
+                play sound "block.note_block.bass" with volume 1 with pitch 1 to player
+            else if {tpa::requesthere::player::%player's uuid%} is set:
+                set {_requester} to {tpa::requesthere::player::%player's uuid%}
+                if player has permission "tpa.admin":
+                    send "%getPrefix()%<##A8A8A8>ᴀᴅᴍɪɴ <##A8A8A8>%player% <##A8A8A8>ʜᴀs ᴅᴇɴɪᴇᴅ ʏᴏᴜʀ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ!" to {_requester}
+                    send "%getPrefix()%<##A8A8A8>ᴀᴅᴍɪɴ <##A8A8A8>ʏᴏᴜ ʜᴀᴠᴇ ᴅᴇɴɪᴇᴅ ᴛʜᴇ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ᴛᴏ <##7AFB00>%{_requester}%!" to player
+                else:
+                    send "%getPrefix()%<##A8A8A8>ʏᴏᴜ ʜᴀᴠᴇ ᴅᴇɴɪᴇᴅ ᴛʜᴇ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ᴛᴏ <##7AFB00>%{_requester}%." to player
+                    send "%getPrefix()%<##A8A8A8>ʏᴏᴜʀ ᴛᴇʟᴇᴘᴏʀᴛ ʀᴇǫᴜᴇsᴛ ᴡᴀs ᴅᴇɴɪᴇᴅ ʙʏ <##7AFB00>%player%." to {_requester}
+                delete {tpa::requesthere::player::%player's uuid%}
+                delete {tpa::requesthere_time::%player's uuid%}
+                play sound "block.note_block.bass" with volume 1 with pitch 1 to player
+    else if name of event-inventory is "<##37BFF8>ᴄᴏɴꜰɪʀᴍ ᴛᴘᴀ ʀᴇǫᴜᴇsᴛ":
+        cancel event
+        if index of event-slot is 11:
+            if {tpa::confirm::%player's uuid%} is set:
+                set {_target} to {tpa::confirm::%player's uuid%}
+                close player's inventory
+                sendTpaRequest(player, {_target})
+                delete {tpa::confirm::%player's uuid%}
+                play sound "block.note_block.pling" with volume 1 with pitch 1 to player
+        else if index of event-slot is 15:
+            close player's inventory
+            delete {tpa::confirm::%player's uuid%}
+            send "%getPrefix()%<##A8A8A8>ᴛᴘᴀ ʀᴇǫᴜᴇsᴛ ᴄᴀɴᴄᴇʟᴇᴅ" to player
+            play sound "block.note_block.bass" with volume 1 with pitch 1 to player
+    else if name of event-inventory contains "<##37BFF8>sᴇʟᴇᴄᴛ ᴘʟᴀʏᴇʀ ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ - ᴘᴀɢᴇ":
+        cancel event
+        set {_slot} to index of event-slot
+        if {_slot} is 45:
+            set {_name} to name of event-inventory
+            set {_start_index} to last index of "ᴘᴀɢᴇ " in {_name}
+            set {_page_str} to substring of {_name} from {_start_index} + 5 to length of {_name} - 1
+            set {_current_page} to {_page_str} parsed as integer
+            if {_current_page} > 1:
+                close player's inventory
+                openTpaPlayerMenu(player, {_current_page} - 1)
+                play sound "block.note_block.pling" with volume 1 with pitch 1 to player
+        else if {_slot} is 49:
+            close player's inventory
+            play sound "block.note_block.bass" with volume 1 with pitch 1 to player
+        else if {_slot} is 53:
+            set {_name} to name of event-inventory
+            set {_start_index} to last index of "ᴘᴀɢᴇ " in {_name}
+            set {_page_str} to substring of {_name} from {_start_index} + 5 to length of {_name} - 1
+            set {_current_page} to {_page_str} parsed as integer
+            set {_players::*} to all players where [input is not player]
+            set {_total} to size of {_players::*}
+            set {_total_pages} to ceiling({_total} / {@players_per_page})
+            if {_current_page} < {_total_pages}:
+                close player's inventory
+                openTpaPlayerMenu(player, {_current_page} + 1)
+                play sound "block.note_block.pling" with volume 1 with pitch 1 to player
+        else if {_slot} < 45:
+            if {tpa::menu::slot::%{_slot}%::%player's uuid%} is set:
+                set {_target} to {tpa::menu::slot::%{_slot}%::%player's uuid%}
+                close player's inventory
+                openTpaConfirmMenu(player, {_target})
+                delete {tpa::menu::slot::%{_slot}%::%player's uuid%}
+                play sound "block.note_block.pling" with volume 1 with pitch 1 to player
+    else if name of event-inventory is "<##37BFF8>ᴛᴘᴀ ᴀᴅᴍɪɴ":
+        cancel event
+        if player has permission "tpa.admin":
+            if index of event-slot is 10:
+                execute console command "sk reload tpa"
+                close player's inventory
+                send "%getPrefix()%<##7AFB00>ᴛᴘᴀ ʜᴀs ʙᴇᴇɴ ʀᴇʟᴏᴀᴅᴇᴅ sᴜᴄᴄᴇssꜰᴜʟʟʏ!" to player
+                play sound "entity.player.levelup" with volume 1 with pitch 2 to player
+            else if index of event-slot is 12:
+                close player's inventory
+                if {tpa::prefix} is true:
+                    delete {tpa::prefix}
+                    send "%getPrefix()%<##A8A8A8>ᴘʀᴇꜰɪx ᴏꜰ ᴛᴘᴀ ʜᴀs ʙᴇᴇɴ ᴅɪsᴀʙʟᴇᴅ!" to player
+                else:
+                    set {tpa::prefix} to true
+                    send "%getPrefix()%<##7AFB00>ᴘʀᴇꜰɪx ᴏꜰ ᴛᴘᴀ ʜᴀs ʙᴇᴇɴ ᴇɴᴀʙʟᴇᴅ!" to player
+                play sound "entity.experience_orb.pickup" with volume 1 with pitch 1 to player
+            else if index of event-slot is 16:
+                close player's inventory
+                play sound "block.note_block.bass" with volume 1 with pitch 1 to player
+        else:
+            close player's inventory
+            send "%getPrefix()%<##A8A8A8>ʏᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴ ᴛᴏ ᴜsᴇ ᴛʜᴇ ᴀᴅᴍɪɴ ᴍᴇɴᴜ." to player
+
+on player move:
+    if {tpa::%player's uuid%::teleporting} is set:
+        cancel event
+
+on load:
+    if {tpa::prefix} is not set:
+        set {tpa::prefix} to true
+    message "<##A8A8A8>───────────────────────────────" to console
+    message "<##7AFB00>ᴛᴘᴀ ʜᴀs ʙᴇᴇɴ ᴇɴᴀʙʟᴇᴅ sᴜᴄᴄᴇssꜰᴜʟʟʏ!" to console
+    message "<##A8A8A8>TPA Menu V1.7 by Omh" to console
+    message "<##A8A8A8>───────────────────────────────" to console
+
+on unload:
+    message "<##A8A8A8>───────────────────────────────" to console
+    message "<##FF0000>ᴛᴘᴀ ʜᴀs ʙᴇᴇɴ ᴅɪsᴀʙʟᴇᴅ sᴜᴄᴄᴇssꜰᴜʟʟʏ!" to console
+    message "<##A8A8A8>TPA Menu V1.7 by Omh" to console
+    message "<##A8A8A8>───────────────────────────────" to console
