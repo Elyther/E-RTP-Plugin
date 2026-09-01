@@ -1,0 +1,325 @@
+# ==============================================================================================
+#                                EYITLE SMP - HOMES GUI SYSTEM
+# ==============================================================================================
+
+options:
+    gui: &8&lEvlerim Menüsü
+    nohome: &c&lEv %{_home}% &cayarlanmamış.
+    nohomeGUI: &c&lEv %{_home}% &cayarlanmamış
+    noperm: &4Hata: &cYetkiniz bulunmuyor.
+
+
+# ==============================================================================================
+#                                      INVENTORY EVENTS
+# ==============================================================================================
+
+on inventory click:
+
+    # ---------------------------------------------
+    # Silme Onay Menüsü
+    # ---------------------------------------------
+
+    if name of event-inventory contains "Silmeyi onayla":
+        cancel event
+
+        if index of event-slot is 12:
+            play sound "UI_BUTTON_CLICK" to player
+
+            clear {home.%{home.number::%player's uuid%}%::%player's uuid%}
+
+            send "&c&lEv %{home.number::%player's uuid%}% &csilindi." to player
+
+            make player execute command "/home"
+
+        if index of event-slot is 14:
+            play sound "UI_BUTTON_CLICK" to player
+            make player execute command "/home"
+
+
+    # ---------------------------------------------
+    # Ana Home Menüsü
+    # ---------------------------------------------
+
+    if name of event-inventory is "{@gui}":
+        cancel event
+
+        # Kapat
+        if index of event-slot is 22:
+            play sound "UI_BUTTON_CLICK" to player
+            close player's inventory
+            stop
+
+        set {_home} to 0
+
+        loop 5 times:
+            add 1 to {_home}
+
+            set {_bed_slot} to {_home} + 1
+            set {_opt_slot} to {_home} + 10
+
+
+            # ---------------------------------------------
+            # VIP Home Koruması
+            # ---------------------------------------------
+
+            if {_home} > 2:
+                if player does not have permission "home.vip":
+
+                    if index of event-slot is {_opt_slot} or {_bed_slot}:
+                        play sound "BLOCK_ANVIL_LAND" to player
+
+                        send "&9〔&3Home&9〕 &eBu evi kullanmak için &bVIP &eolmalısınız!" to player
+
+                        stop
+
+
+            # ---------------------------------------------
+            # Home Ayarla / Sil
+            # ---------------------------------------------
+
+            if index of event-slot is {_opt_slot}:
+                play sound "UI_BUTTON_CLICK" to player
+
+                if {home.%{_home}%::%player's uuid%} is not set:
+
+                    set {home.%{_home}%::%player's uuid%} to location of player
+
+                    send "&a&lEv %{_home}% &aşu anki konumuna kaydedildi." to player
+
+                    make player execute command "/home"
+
+                else:
+
+                    set {_confirm_gui} to chest inventory with 3 rows named "&eSilmeyi onayla: &lEv %{_home}%?"
+
+                    set slot 4 of {_confirm_gui} to red bed named "&a&lEv %{_home}%"
+                    set slot 12 of {_confirm_gui} to lime dye named "&aOnayla"
+                    set slot 14 of {_confirm_gui} to red dye named "&cİptal Et"
+
+                    set {home.number::%player's uuid%} to {_home}
+
+                    open {_confirm_gui} to player
+
+                stop
+
+
+            # ---------------------------------------------
+            # Home Teleport
+            # ---------------------------------------------
+
+            if index of event-slot is {_bed_slot}:
+
+                if {home.%{_home}%::%player's uuid%} is set:
+
+                    play sound "UI_BUTTON_CLICK" to player
+
+                    close player's inventory
+
+                    set {_x} to x-coordinate of player
+                    set {_y} to y-coordinate of player
+                    set {_z} to z-coordinate of player
+
+                    set {_timer} to 5
+                    set {_moved} to false
+
+                    loop 5 times:
+
+                        if x-coordinate of player is not {_x}:
+                            set {_moved} to true
+
+                        if y-coordinate of player is not {_y}:
+                            set {_moved} to true
+
+                        if z-coordinate of player is not {_z}:
+                            set {_moved} to true
+
+                        if {_moved} is true:
+
+                            send action bar "&cIşınlanma iptal edildi (Hareket ettiniz)" to player
+                            play sound "BLOCK_ANVIL_LAND" to player
+
+                            stop
+
+                        else:
+
+                            send action bar "&aIşınlanılıyor: &e%{_timer}% &asaniye" to player
+
+                            play sound "BLOCK_NOTE_BLOCK_PLING" with pitch 10 to player
+
+                            remove 1 from {_timer}
+
+                            wait a second
+
+                    send action bar "&aEv %{_home}% &akonumuna ışınlandınız" to player
+
+                    teleport player to {home.%{_home}%::%player's uuid%}
+
+                    play sound "ENTITY_ENDERMAN_TELEPORT" with pitch 0.5 to player
+
+                    apply blindness 2 to player for 1 second
+
+                else:
+
+                    send "{@nohome}" to player
+
+                stop
+
+
+# ==============================================================================================
+#                                      COMMANDS
+# ==============================================================================================
+
+
+# ---------------------------------------------
+# /home
+# ---------------------------------------------
+
+command /home:
+    description: Evlerim menüsünü açar.
+    executable by: player
+
+    trigger:
+
+        set {_gui} to chest inventory with 3 rows named "{@gui}"
+
+        loop 5 times:
+
+            set {_h} to loop-number
+
+
+            # ---------------------------------------------
+            # VIP Home Dizaynı
+            # ---------------------------------------------
+
+            if {_h} > 2:
+
+                if player does not have permission "home.vip":
+
+                    set slot {_h}+1 of {_gui} to black bed named "&c&lEv %{_h}% &7(Kilitli)" with lore "&7Bu evi açmak için", "&bVIP &7olmanız gerekmektedir."
+
+                    set slot {_h}+10 of {_gui} to gray dye named "&cKilitli &7(VIP)"
+
+                    continue loop
+
+
+            # ---------------------------------------------
+            # Home Ayarlanmamış
+            # ---------------------------------------------
+
+            if {home.%{_h}%::%player's uuid%} is not set:
+
+                set slot {_h}+1 of {_gui} to light gray bed named "&7Ev %{_h}% ayarlanmamış"
+
+                set slot {_h}+10 of {_gui} to gray dye named "&aAyarlamak için tıkla"
+
+
+            # ---------------------------------------------
+            # Home Ayarlanmış
+            # ---------------------------------------------
+
+            else:
+
+                set slot {_h}+1 of {_gui} to red bed named "&a&lEv %{_h}%" with lore "&7Işınlanmak için tıkla"
+
+                set slot {_h}+10 of {_gui} to lime dye named "&cSilmek için tıkla"
+
+
+        # ---------------------------------------------
+        # Kapatma
+        # ---------------------------------------------
+
+        set slot 22 of {_gui} to nether star named "&cKapat"
+
+        open {_gui} to player
+
+
+# ==============================================================================================
+#                              /player <oyuncu> <home>
+# ==============================================================================================
+
+command /player [<player>] [<number>]:
+    description: Bir oyuncunun home'una teleport olur.
+    permission: home.admin
+    executable by: players
+
+    trigger:
+
+        # ---------------------------------------------
+        # Oyuncu belirtilmemiş
+        # ---------------------------------------------
+
+        if arg-1 is not set:
+
+            send "&cKullanım: &e/player <oyuncu> <home>" to player
+
+            stop
+
+
+        # ---------------------------------------------
+        # Home numarası belirtilmemiş
+        # ---------------------------------------------
+
+        if arg-2 is not set:
+
+            send "&cKullanım: &e/player <oyuncu> <home>" to player
+
+            stop
+
+
+        # ---------------------------------------------
+        # Home numarası kontrolü
+        # ---------------------------------------------
+
+        if arg-2 < 1 or arg-2 > 5:
+
+            send "&cHome numarası &e1-5 &carasında olmalıdır." to player
+
+            stop
+
+
+        # ---------------------------------------------
+        # Home mevcut mu?
+        # ---------------------------------------------
+
+        if {home.%arg-2%::%uuid of arg-1%} is not set:
+
+            send "&c%arg-1% &cadlı oyuncunun &eHome %arg-2% &cadlı evi ayarlanmamış." to player
+
+            stop
+
+
+        # ---------------------------------------------
+        # Teleport
+        # ---------------------------------------------
+
+        play sound "ENTITY_ENDERMAN_TELEPORT" with pitch 0.5 to player
+
+        teleport player to {home.%arg-2%::%uuid of arg-1%}
+
+        send "&a%arg-1% &adlı oyuncunun &eHome %arg-2% &akonumuna ışınlandınız." to player
+
+
+# ==============================================================================================
+#                                  /delallhome
+# ==============================================================================================
+
+command /delallhome [<player>]:
+    permission: op
+
+    trigger:
+
+        if arg-1 is not set:
+
+            loop 5 times:
+
+                clear {home.%loop-number%::%player's uuid%}
+
+            send "&aBütün evleriniz silindi." to player
+
+        else:
+
+            loop 5 times:
+
+                clear {home.%loop-number%::%arg-1's uuid%}
+
+            send "&a%arg-1% adlı oyuncunun bütün evleri silindi." to player
